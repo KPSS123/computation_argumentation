@@ -2,51 +2,73 @@ import scrapy
 from demo_project.items import JokeItem
 from scrapy.loader import ItemLoader
 
+title_1 = []
+desc_yes = []
+title2 = []
+desc_no = []
+title = []
+list_A = []
+list_B = []
+list_C = []
+list_D = []
+list_E = []
+
+
 class DebateSpider(scrapy.Spider):
     name= 'debate'
 
     start_urls = [
     'https://www.debate.org/opinions/do-you-agree-with-the-black-lives-matter-movement-1'
     ]
+    
 
     def parse(self, response):
-        # i = 0
-        # for debate in response.xpath("/html/body/div[2]/div[4]/div/div/div/div[4]/div[1]"):
-            # //*[@id="yes-arguments"]
-        # for debate in response.xpath("/html/body/div[2]/div[4]/div/div/div/div[4]/div[1]/ul/li"):
-        # for debate in reponse.xpath("/html/body/div[2]/div[4]/div/div/div/div[4]")
-            
+
         for debate in response.xpath("/html/body/div[2]/div[4]/div/div/div/div[4]/div[1]/ul/li"):
             # yes ke liye
-            # name = debate.xpath("a/text()").get
-            # link = debate.xpath(".//@href").get
-            title = debate.xpath('a/@href').extract()
-            # link = debate.xpath('a/@href').extract()
-            desc = debate.xpath('p/text()').extract()
-            print (title, desc )
+            title_1 = debate.xpath('.//@href').extract()
+            list_A.append(title_1)
+            desc_yes = debate.xpath('p/text()').extract()
+            list_B.append(desc_yes)
+        
+        print (len(list_A), len(list_B))
         
         print("---------------")
             
-        for debate in response.xpath("/html/body/div[2]/div[4]/div/div/div/div[4]/div[2]/ul/li"):
+        for debate1 in response.xpath("/html/body/div[2]/div[4]/div/div/div/div[4]/div[2]/ul/li"):
             # No ke liye
-            title2 = debate.xpath('a/@href').extract()
-            # link = debate.xpath('a/@href').extract()
-            desc2 = debate.xpath('p/text()').extract()
+            title2 = debate1.xpath('.//@href').extract()
+            list_C.append(title2)
+            desc_no = debate1.xpath('p/text()').extract()
+            list_D.append(desc_no)
+            title = debate1.xpath('a/text()').extract()
+            list_E.append(title)
+            # print (len(title2), len(desc_no), len(title))
+        
+        print (len(list_C), len(list_D), len(list_E))
 
-                # /html/body/div[2]/div[4]/div/div/div/div[4]/div[1]/ul/li[1]/h2
+        print("---------------*****")
 
-            print (title2, desc2 )
-
-            yield {
-                # 'pro_Newtext': debate.xpath("/html/body/div[2]/div[4]/div/div/div/div[4]/div[1]/ul/li[%d]/p"%i).extr
-                # 'title':title,
-                # 'desc':desc,
-                'title2':title2,
-                'desc2':desc2,
+        # for debate1 in zip(title_1,desc_yes,desc_no):
+        for i in range(2):
+            # print("Hey ya")
+            scraped_info = {
+            'title1' : list_A[i],
+            'desc_yes' : list_B[i],
+            'desc_no' : list_D[i]
             }
+        
+            yield scraped_info
 
-        next_page= response.xpath("/html/body/div[2]/div[4]/div/div/div/div[5]/a/@href").extract_first()
-        if next_page is not None:
-            # print("kaise ho beta")
-            next_page_link= response.urljoin(next_page) 
-            yield scrapy. Request(url=next_page_link, callback=self.parse)
+        # next_page= response.xpath("/html/body/div[2]/div[4]/div/div/div/div[5]/a/@href").extract_first()
+        # print(next_page)
+        # if next_page is not None:
+        #     print("kaise ho beta")
+        #     next_page_link= response.urljoin(next_page) 
+        #     yield scrapy. Request(url=next_page_link, callback=self.parse)
+
+
+        if response.xpath("//a/@rel='next'\").get() == '1'):
+            print("next page mkj")
+            next_page = response.xpath('//a[@rel='next']/@href').get()
+            yield response.follow(url=next_page , callback=self.parse) 
