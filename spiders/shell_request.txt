@@ -1,0 +1,5 @@
+from scrapy import Request; 
+import json; 
+(fetch(Request(url='https://www.debate.org/opinions/~services/opinions.asmx/GetDebateArgumentPage', method='POS
+ody='{debateId: "DF5F0C8D-BDA6-4C05-9C50-07FCD527D8BE", pageNumber: 6, itemsPerPage: 10, ysort: 5, nsort: 5}', head
+'X-Requested-With': 'XMLHttpRequest', 'Content-Type': 'application/json; charset=UTF-8'}, )), print(response.text))
